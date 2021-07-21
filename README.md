@@ -19,15 +19,15 @@ The permissions on key registry hives are set to allow all non-admin users to re
 # What does the exploit do?
 Allows you to read SAM data (sensitive) in Windows 10, as well as the SYSTEM and SECURITY hives.
 
-This exploit uses VSC to extract the SAM, SYSTEM, and SECURITY hives even when in use, and saves them in current directory as HIVENAME-haxx, for use with whatever cracking tools, or whatever, you want.
+This exploit uses VSC to extract the SAM, SYSTEM, and SECURITY hives even when in use, and saves them in current directory as HIVENAME, for use with whatever cracking tools, or whatever, you want.
 
 # Pulling Credentials out
 ```
-python3 secretsdump.py -sam SAM-haxx -system SYSTEM-haxx -security SECURITY-haxx LOCAL
+python3 secretsdump.py -sam SAM -system SYSTEM -security SECURITY LOCAL
 ```
 
 # Bugs and issues
-- Currently only looks for the first four system recovery snapshots.
+- Currently only looks for the first ten system recovery snapshots.
 - ~~Haven't added support for dumping SECURITY, SYSTEM etc registry hives yet as I can't be bothered.~~
 
 # More info?
